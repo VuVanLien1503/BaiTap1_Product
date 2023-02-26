@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+</head>
+<body>
+<div th:insert="/layout::nav"></div>
+<div style="margin-left: 400px;width: 400px">
+
+    <table class="table table-hover" style="margin-top: 10px;text-align: center">
+        <thead>
+        <tr>
+            <td colspan="7">
+                <h3 style="color: chartreuse">List Product</h3>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4">
+                <span>Category</span>
+            </td>
+            <td colspan="3" style="text-align: right">
+                <button type="button" class="btn btn-outline-primary"
+                        data-bs-toggle="modal"
+                        data-bs-target="#exampleModal">Create New
+                </button>
+            </td>
+        </tr>
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Descr</th>
+            <th>Image</th>
+            <th colspan="2">Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="element,stt:${listProduct}">
+            <td th:text="${stt.count}"></td>
+            <td th:text="${element.name}"></td>
+            <td th:text="${element.price}"></td>
+            <td th:text="${element.description}"></td>
+            <td><img width="100" height="100" th:src="@{'/' + ${element.img}}" alt="error"></td>
+            <td>
+                <a th:href="@{/products/update/__${element.id}__}" class="btn btn-outline-success">UPDATE</a>
+            </td>
+            <td>
+                <button th:onclick="'deleteProduct('+${element.id}+')'" class="btn btn-outline-danger">DELETE</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div>
+        <nav>
+            <ul class="pagination">
+                <li class="page-item" th:classappend="${currentPage == 0} ? disabled">
+                    <a class="page-link"
+                       th:href="@{${'/products/?page=' + (currentPage - 1) + '&size=' + 3}}">Previous</a>
+                </li>
+                <li class="page-item" th:classappend="${currentPage == i} ? active"
+                    th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                    <a class="page-link" th:href="@{${'/products/?page=' + i + '&size=' + 3}}" th:text="${i + 1}"></a>
+                </li>
+                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? disabled">
+                    <a class="page-link" th:href="@{${'/products/?page=' + (currentPage + 1) + '&size=' + 3}}">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+<form th:action="@{/products/create}" method="post" th:object="${product}"
+      novalidate="novalidate" enctype="multipart/form-data">
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Create New Product</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" th:field="*{name}" id="name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="price" class="form-label">Price</label>
+                        <input type="text" class="form-control" th:field="*{price}" id="price">
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <input type="text" class="form-control" th:field="*{description}" id="description">
+                    </div>
+                    <div class="mb-3">
+                        <label for="img" class="form-label">Image</label>
+                        <input type="file" class="form-control" th:field="*{multipartFile}" id="img" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a th:href="@{/products}" class="btn btn-secondary" data-bs-dismiss="modal">Close</a>
+                    <button class="btn btn-primary">SAVE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    function deleteProduct(id) {
+        let res = window.confirm("Bạn có chắn chắn muốn xóa không?");
+        if (res) {
+            window.location.href = '/products/delete/' + id;
+        } else {
+            window.location.href = '/products';
+        }
+    }
+</script>
+
+<div th:insert="/layout::footer">
+</div>
+</body>
+</html>
